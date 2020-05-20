@@ -7,6 +7,7 @@ library(tidyverse)
 library(pdftools)
 
 
+## Try it out on one file #####
 pdf = 'data/Lenawee MI_IRS 990_2019.pdf'
 
 raw_text = pdf_text(pdf = pdf)
@@ -31,19 +32,23 @@ date_match = text[str_detect(text, pattern = pattern_date)]
 date = str_replace(date_match, pattern = ".*ending\\s*", replacement = "")
 # looking good!
 
-# Now to generalize:
+# Now to generalize:  ####
 
-scrape_990 = function(pdf) {
+scrape_990 = function(pdf, debug = FALSE) {
   raw_text = pdf_text(pdf = pdf)
+  
+  if(debug) {
+    browser()
+  }
   
   if(raw_text == "") {
     return(data.frame(n_employees = integer(0), date = character(0)))
   }
 
   text =
-  raw_text %>% 
-  read_lines() %>%
-  str_trim()
+    raw_text %>% 
+    read_lines() %>%
+    str_trim()
 
   
   # Goal: 
@@ -59,16 +64,27 @@ scrape_990 = function(pdf) {
   pattern_date = "For the.*calendar year, or tax year beginning"
 
   date_match = text[str_detect(text, pattern = pattern_date)]
-  date = str_replace(date_match, pattern = ".*ending\\s*", replacement = "")
+  date = str_replace(date_match, pattern = ".*ending\\s*", replacement = "") %>%
+    str_replace_all("\\s+", " ")
   
   return(data.frame(n_employees = line5, date = date))
 }
 
-all_990s = list.files(path = "data/")
+data_dir = "data/"
+all_990s = list.files(path = data_dir)
+# Alternately, we could put the path to the data files in a variable and use that
+# If it starts with "C:/..." or somethign like that, R will be smart
+# wd = "C:/Users/..."
+# all_990s = list.files(path = wd)
+
+affiliate_name = str_replace(all_990s, pattern = "_.*", "")
 
 results = list()
 for (i in 1:length(all_990s)) {
-  results[[i]] = scrape_990(paste0("data/", all_990s[i]))
+  results[[i]] = scrape_990(paste0(data_dir, all_990s[i]))
 }
+names(results) = affiliate_name[1:length(results)]
 
-results = bind_rows(results)
+combined_results = bind_rows(results, .id = "affiliate")
+combined_results
+
