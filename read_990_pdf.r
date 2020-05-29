@@ -17,9 +17,12 @@ read_990_pdf = function(pdf) {
 }
 
 
-read_990_ocr = function(pdf, pages_tried) {
-  if(missing(pages_tried)) {
-    ## TODO get doc info
-  }
-  raw_text = pdf_ocr_text()
+read_990_ocr = function(pdf, pages) {
+  raw_text = pdf_ocr_text(pdf, pages)
+  text =
+    raw_text %>% 
+    read_lines() %>%
+    str_trim()
+  
+  return(text)
 }

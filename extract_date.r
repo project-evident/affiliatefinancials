@@ -9,5 +9,8 @@ extract_date = function(text) {
   if(length(date) == 0) {
     date = NA
   }
+  if(length(date) > 1) {
+    date = paste(date, collapse = ";")
+  }
   return(date)
 }
