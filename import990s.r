@@ -60,12 +60,19 @@ scrape_990 = function(pdf, debug = FALSE) {
 
   line5_match = text[str_detect(text, pattern = pattern_line5)]
   line5 = as.integer(str_extract(line5_match, "[0-9]+$"))
+  if(length(line5) == 0) {
+    line5 = NA
+  }
 
   pattern_date = "For the.*calendar year, or tax year beginning"
 
   date_match = text[str_detect(text, pattern = pattern_date)]
   date = str_replace(date_match, pattern = ".*ending\\s*", replacement = "") %>%
     str_replace_all("\\s+", " ")
+  
+  if(length(date) == 0) {
+    date = NA
+  }
   
   return(data.frame(n_employees = line5, date = date))
 }

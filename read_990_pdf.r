@@ -3,6 +3,9 @@ read_990_pdf = function(pdf) {
   
   if(raw_text == "") {
     ## TODO attempt OCR
+    
+    ## For now - 
+    return("")
   }
   
   text =
@@ -13,3 +16,10 @@ read_990_pdf = function(pdf) {
   return(text)
 }
 
+
+read_990_ocr = function(pdf, pages_tried) {
+  if(missing(pages_tried)) {
+    ## TODO get doc info
+  }
+  raw_text = pdf_ocr_text()
+}
