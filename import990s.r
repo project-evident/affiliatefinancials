@@ -95,3 +95,4 @@ names(results) = affiliate_name[1:length(results)]
 combined_results = bind_rows(results, .id = "affiliate")
 combined_results
 
+

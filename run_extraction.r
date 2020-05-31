@@ -41,21 +41,27 @@ text = map(results$file_path, read_990_pdf)
 names(text) = results$file_name # name the list according to the affiliate
 
 # tracking columns
-results$text_blank = map_lgl(text, ~ identical(., ""))
+results$no_ocr_needed = map_lgl(text, ~ !identical(., ""))
+
+# run OCR
+for(i in 1:length(text)) {
+  if(results$no_ocr_needed[i]) {
+    next # skip to next iteration if the results are not blank
+  }
+  text[[i]] = read_990_ocr(results$file_path[i], pages = 1:min(5, results$pdf_length[i]))
+}
+
+# Save the imported 990s!
+saveRDS(text, "imported_990s.rds")
+
+# check if any blanks remain
+any(map_lgl(text, ~ identical(., "")))
+# FALSE - good, no blanks
 
 # try to pull numbers
 results[!results$text_blank, "date"] = map_chr(text[results$file_name[!results$text_blank]], extract_date)
 results[!results$text_blank, "n_emp"] = map_chr(text[results$file_name[!results$text_blank]], extract_line5)
 
-results$date_blank = is.na(results$date)
+results$date_blank = is.na(results$date) | results$date == ""
 results$n_emp_blank = is.na(results$n_emp)
-
-# run OCR
-for(i in 1:length(text)) {
-  if(!results$text_blank[i]) {
-    next # skip if the results are not blank
-  }
-  text[[i]] = read_990_ocr(results$file_path[i], pages = 1:min(5, results$pdf_length[i]))
-}
-
 
