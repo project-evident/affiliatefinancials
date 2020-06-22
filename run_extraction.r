@@ -1,3 +1,4 @@
+##### DATED - does not work. Leaving in for tutorial elements
 library(tidyverse)
 library(pdftools)
 
@@ -18,6 +19,10 @@ results = tibble(
 
 # create new column named 'affiliate', and put the affiliate names in it
 results$affiliate = str_replace(all_990s, pattern = "_.*", "")
+
+states = substr(results$affiliate, start = nchar(results$affiliate) - 1, stop = nchar(results$affiliate))
+str_extract(results$affiliate, pattern = "[A-Z]{2}$")
+
 
 # ## ways to refer to columns
 # results[["affiliate"]] # good

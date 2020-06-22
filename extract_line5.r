@@ -2,15 +2,20 @@ extract_line5 = function(text) {
   pattern = "Total number of individuals employed in calendar year"
 
   match = text[str_detect(text, pattern = pattern)] %>% unique
-  
-  line5 = as.integer(str_extract(match, "[0-9]+$"))
-  if(length(line5) == 0) {
-    line5 = NA
-  }
-  # if(length(line5 > 1)) {
-  #   return(NA)
-  # }
-  return(line5)
+  if(length(match) == 0) match = NA_character_
+  return(match)
 }
 
-extract_line5_multicol 
+
+extract_emp_from_line = function(match) {
+  emp = 
+    match %>% 
+    str_replace("line 2a", "") %>%  # prevent some false matches
+    str_replace("year 2018", "") %>%
+    stringi::stri_extract_last_regex("[0-9]+") %>%
+    as.numeric
+  if(length(emp) == 0) {
+    emp = NA_real_
+  }
+  return(emp)
+}
